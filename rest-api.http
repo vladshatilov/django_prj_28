@@ -1,0 +1,32 @@
+POST http://127.0.0.1:8000/cat/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "test7"
+}
+
+
+###
+POST http://127.0.0.1:8000/ad/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "test7",
+  "author": "vlad",
+  "description": "desc",
+  "address": "michman",
+  "price": 25
+}
+
+###
+POST http://127.0.0.1:8000/ad/21/update/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Vladissimo"
+}
+
+###
