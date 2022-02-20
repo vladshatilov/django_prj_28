@@ -118,9 +118,9 @@ class CategoryUpdate(UpdateView):
     fields = ['name']
 
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
+        self.object = self.get_object()
         data = json.loads(request.body)
-        self.object.name = data['name']
+        self.object.name = data.get('name', self.object.name)
         self.object.save()
         return JsonResponse({"id": self.object.id, "name": self.object.name}, status=201)
 
@@ -213,8 +213,8 @@ class AdsUpdate(UpdateView):
     fields = ['name', 'author', 'price', 'description', 'address']
 
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
         data = json.loads(request.body)
+        self.object = self.get_object()
         self.object.name = data.get('name', self.object.name)
         self.object.author = data.get('author', self.object.author)
         self.object.price = data.get('price', self.object.price)
@@ -228,7 +228,7 @@ class AdsUpdate(UpdateView):
             "price": self.object.price,
             "description": self.object.description,
             "is_published": self.object.is_published
-        }, status=201)
+        }, status=201, json_dumps_params={'ensure_ascii': False})
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -247,7 +247,6 @@ class AdsImageView(UpdateView):
     fields = ['poster']
 
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
         self.object = self.get_object()
         self.object.poster = request.FILES['image']
         self.object.save()
@@ -348,15 +347,15 @@ class UserUpdate(UpdateView):
     fields = ['username', 'first_name', 'last_name', 'role', 'age', 'locations']
 
     def post(self, request, *args, **kwargs):
-        super().post(request, *args, **kwargs)
+        self.object = self.get_object()
         data = json.loads(request.body)
-        self.object.username = data["username"]
-        self.object.first_name = data["first_name"]
-        self.object.last_name = data["last_name"]
-        self.object.role = data["role"]
-        self.object.age = data["age"]
+        self.object.username = data.get("username", self.object.username)
+        self.object.first_name = data.get("first_name", self.object.first_name)
+        self.object.last_name = data.get("last_name", self.object.last_name)
+        self.object.role = data.get("role", self.object.role)
+        self.object.age = data.get("age", self.object.age)
         self.object.save()
-        for city in data["locations"]:
+        for city in data.get("locations", list(map(str, self.object.locations.all()))):
             city_obj, _ = City.objects.get_or_create(name=city)
             self.object.locations.add(city_obj)
         self.object.save()
